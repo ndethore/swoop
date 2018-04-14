@@ -1,0 +1,11 @@
+{
+    "name": "Swoop!",
+    "version": "1.0",
+    "description": "Tab navigation done right.",
+    "manifest_version": 2,
+		"background": {
+			"scripts": ["eventPage.js"],
+			"persistent": true
+		},
+		"permissions": ["tabs"]
+  }
