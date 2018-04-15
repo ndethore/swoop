@@ -1,0 +1,22 @@
+{
+  "name": "swoop",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Nicolas <nicolas.dethore@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
+    "mithril": "^1.1.6",
+    "webpack": "^4.4.1"
+  },
+  "scripts": {
+    "start": "webpack -d --watch",
+    "build": "webpack -p"
+  },
+  "devDependencies": {
+    "webpack-cli": "^2.0.13"
+  }
+}
