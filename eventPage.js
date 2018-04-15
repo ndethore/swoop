@@ -33,10 +33,13 @@ function onTabAttached(tabId, attachInfo) {
 }
 
 function onTabMoved(tabId, moveInfo) {
-	console.log(`Tab ${tabId} moved.`);
+	console.log(`Moving tab ${tabId} from ${moveInfo.fromIndex} to ${moveInfo.toIndex}.`);
 	if (moveInfo.windowId == windowId) {
-		var tab = openTabs.splice(moveInfo.fromIndex, 1);
-		openTabs.splice(moveInfo.toIndex, 0, tab);
+		console.log("windowcheck ok");
+
+		var removed = openTabs.splice(moveInfo.fromIndex, 1);
+		openTabs.splice(moveInfo.toIndex, 0, removed[0]);
+			console.log(`Tab ${tabId} moved.`);
 	}
 }
 
