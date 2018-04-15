@@ -2,15 +2,19 @@ var windowId = -1;
 var openTabs = [];
 
 function initialize(_) {
-	windowId = chrome.windows.WINDOW_ID_CURRENT;
+	chrome.windows.getCurrent(function (window) {
+		// windowId = chrome.windows.WINDOW_ID_CURRENT;
+		windowId = window.id;
+		console.log("WindowId: " + windowId);
+		console.log("Loading open tabs...");
+		chrome.tabs.query({'windowId': windowId}, function(tabs) {
+			if (tabs.length > 0) {
+				console.log("Restoring tabs!");
 
-	console.log("Loading open tabs...");
-	chrome.tabs.query({'windowId': windowId}, function(tabs) {
-		if (tabs.length > 0) {
-			console.log("Restoring tabs!");
+			}
+			openTabs = tabs;
+		});
 
-		}
-		openTabs = tabs;
 	});
 }
 
@@ -37,8 +41,10 @@ function onTabMoved(tabId, moveInfo) {
 }
 
 function onTabUpdated(tabId, changeInfo, tab) {
+	console.log(`Updating tab ${tabId} - windowId: ${tab.windowId}...`);
 	if (tab.windowId == windowId) {
 		openTabs[tab.index] = tab;
+		console.log(`Tab ${tabId} updated.`);
 	}
 }
 
@@ -67,6 +73,7 @@ if (chrome.runtime && chrome.runtime.onStartup) {
 	chrome.runtime.onStartup.addListener(initialize);
 	chrome.tabs.onCreated.addListener(onTabCreated);
 	chrome.tabs.onAttached.addListener(onTabAttached);
+	chrome.tabs.onUpdated.addListener(onTabUpdated);
 	chrome.tabs.onMoved.addListener(onTabMoved);
 	chrome.tabs.onDetached.addListener(onTabDetached);
 	chrome.tabs.onRemoved.addListener(onTabRemoved);
