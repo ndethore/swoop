@@ -1,11 +1,16 @@
 {
-    "name": "Swoop!",
-    "version": "1.0",
-    "description": "Tab navigation done right.",
-    "manifest_version": 2,
-		"background": {
-			"scripts": ["eventPage.js"],
-			"persistent": true
-		},
-		"permissions": ["tabs"]
-  }
+	"name": "Swoop!",
+	"version": "1.0",
+	"description": "Tab navigation done right.",
+	"manifest_version": 2,
+	"background": {
+		"scripts": ["eventPage.js"],
+		"persistent": true
+	},
+	"permissions": ["tabs"],
+	"content_scripts": [{
+		"matches": ["*://*/*"],
+		"css": ["content-script/styles.css"],
+		"js": ["content-script/bin/app.js"]
+		}]
+}
