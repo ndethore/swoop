@@ -1,4 +1,4 @@
-#switcher { display: none; width: 100%; height: 100%; position: fixed; left: 0; top: 0; z-index: 1; background-color: white; text-align: center;}
+#switcher { display: none; width: 100%; height: 100%; position: fixed; left: 0; top: 0; z-index: 9999; background-color: white; text-align: center;}
 #switcher.visible { display: block; }
 #tab-list { position: relative; max-width: 340px; margin: 32px auto;}
 .tab { margin-bottom: 20px; text-align: left;}
