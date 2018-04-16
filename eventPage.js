@@ -80,6 +80,13 @@ if (chrome.runtime && chrome.runtime.onStartup) {
 	chrome.tabs.onMoved.addListener(onTabMoved);
 	chrome.tabs.onDetached.addListener(onTabDetached);
 	chrome.tabs.onRemoved.addListener(onTabRemoved);
+	chrome.runtime.onConnect.addListener(function(port) {
+		console.assert(port.name == "swoop");
+		port.onMessage.addListener(function(msg) {
+			if (msg.command == "get_all")
+				port.postMessage({command: "get_all", "data": JSON.stringify(openTabs.map((element) => { return {id: element.id, favIconUrl: element.favIconUrl, title: element.title, url: element.url} }))});
+		});
+	});
 }
 else {
 	console.log("This extension requires Chrome 23 or above. Please update Chrome and retry.");
