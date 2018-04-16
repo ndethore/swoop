@@ -1,5 +1,6 @@
 var windowId = -1;
 var openTabs = [];
+var port;
 
 function initialize(_) {
 	chrome.windows.getCurrent(function (window) {
@@ -74,19 +75,28 @@ console.log("Starting up...");
 if (chrome.runtime && chrome.runtime.onStartup) {
 	chrome.runtime.onInstalled.addListener(initialize);
 	chrome.runtime.onStartup.addListener(initialize);
+	chrome.runtime.onConnect.addListener(function(_port) {
+		console.log("Accepting connection...");
+		console.assert(_port.name == "swoop");
+		port = _port;
+		console.log("Accepted. Listening to incoming messages...");
+		port.onMessage.addListener(function(msg) {
+			console.log("New message received.")
+			if (msg.command == "get_all")
+				port.postMessage({command: "get_all", "data": JSON.stringify(openTabs.map((element) => { return {id: element.id, favIconUrl: element.favIconUrl, title: element.title, url: element.url} }))});
+		});
+		port.onDisconnect.addListener(function() {
+			console.log("Port disconnected.");
+        port = null;
+    });
+	});
+
 	chrome.tabs.onCreated.addListener(onTabCreated);
 	chrome.tabs.onAttached.addListener(onTabAttached);
 	chrome.tabs.onUpdated.addListener(onTabUpdated);
 	chrome.tabs.onMoved.addListener(onTabMoved);
 	chrome.tabs.onDetached.addListener(onTabDetached);
 	chrome.tabs.onRemoved.addListener(onTabRemoved);
-	chrome.runtime.onConnect.addListener(function(port) {
-		console.assert(port.name == "swoop");
-		port.onMessage.addListener(function(msg) {
-			if (msg.command == "get_all")
-				port.postMessage({command: "get_all", "data": JSON.stringify(openTabs.map((element) => { return {id: element.id, favIconUrl: element.favIconUrl, title: element.title, url: element.url} }))});
-		});
-	});
 }
 else {
 	console.log("This extension requires Chrome 23 or above. Please update Chrome and retry.");
