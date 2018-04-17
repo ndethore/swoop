@@ -34,10 +34,9 @@ function onConnect(_port) {
 
 function handleMessage(msg) {
 	console.log("New message received.")
-	if (msg.command == "get_all")
-		port.postMessage({command: "get_all", "data": JSON.stringify(openTabs.map((element) => { return {id: element.id, favIconUrl: element.favIconUrl, title: element.title, url: element.url} }))});
-	else if (msg.command == "open") {
+ 	if (msg.command == "open") {
 		chrome.tabs.update(msg.tabId, {active: true})
+		port.postMessage({command: "hide"});
 	}
 }
 
@@ -105,6 +104,17 @@ if (chrome.runtime && chrome.runtime.onStartup) {
 	chrome.tabs.onMoved.addListener(onTabMoved);
 	chrome.tabs.onDetached.addListener(onTabDetached);
 	chrome.tabs.onRemoved.addListener(onTabRemoved);
+
+	chrome.commands.onCommand.addListener(function(command) {
+		console.log('Command:', command);
+		if (command == "toggle") {
+			chrome.tabs.executeScript({file: "content-script/bin/app.js"}, function() {
+				chrome.tabs.insertCSS({file: "content-script/styles.css"}, function() {
+					port.postMessage({command: "show", "data": JSON.stringify(openTabs.map((element) => { return {id: element.id, favIconUrl: element.favIconUrl, title: element.title, url: element.url} }))});
+				});
+			});
+		}
+	});
 }
 else {
 	console.log("This extension requires Chrome 23 or above. Please update Chrome and retry.");

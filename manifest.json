@@ -7,10 +7,14 @@
 		"scripts": ["eventPage.js"],
 		"persistent": true
 	},
-	"permissions": ["tabs"],
-	"content_scripts": [{
-		"matches": ["*://*/*"],
-		"css": ["content-script/styles.css"],
-		"js": ["content-script/bin/app.js"]
-		}]
+	"permissions": ["tabs", "<all_urls>"],
+	"commands": {
+			"toggle": {
+				"suggested_key": {
+					"default": "Ctrl+Shift+K",
+					"mac": "Command+Shift+K"
+				},
+				"description": "Toggle switcher UI"
+			}
+		}
 }

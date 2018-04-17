@@ -2,4 +2,4 @@
 #switcher.visible { display: block; }
 #tab-list { position: relative; max-width: 340px; margin: 32px auto;}
 .tab { margin-bottom: 20px; text-align: left;}
-.tab.selected { background-color: grey; }
+.tab.selected { background-color: lightgrey; }
