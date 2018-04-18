@@ -16,6 +16,7 @@ var options = {
 ]
 };
 
+
 function initialize(_) {
 	chrome.windows.getCurrent(function (window) {
 		// windowId = chrome.windows.WINDOW_ID_CURRENT;
@@ -31,19 +32,23 @@ function initialize(_) {
 	});
 }
 
-function handleMessage(msg) {
-	console.log("New message received.")
- 	if (msg.command == "open") {
-		chrome.tabs.update(msg.tabId, {active: true})
-		port.postMessage({command: "hide"});
-	}
-	else if (msg.command == "search") {
-		console.log(`Searching for: ${msg.query}`);
-		var fuse = new Fuse(openTabs, options);
-		var results = fuse.search(msg.query);
-		console.log(`Fuse: ${results.length} results found.`);
-		port.postMessage({command: "show", "data": JSON.stringify(results)});
 
+function handleContentScriptMessage(msg) {
+	console.log("New message received.")
+	switch (msg.command) {
+
+		case "open":
+			chrome.tabs.update(msg.tabId, {active: true})
+			port.postMessage({command: "hide"});
+			break;
+
+		case: "search":
+			var fuse = new Fuse(openTabs, options);
+			var results = fuse.search(msg.query);
+			port.postMessage({command: "show", "data": JSON.stringify(results)});
+			break;
+
+		default: break;
 	}
 }
 
@@ -53,6 +58,7 @@ function onTabCreated(tab) {
 	openTabs.push(tab);
 }
 
+
 function onTabAttached(tabId, attachInfo) {
 	console.log(`Tab ${tabId} attached.`);
 	if (attachInfo.windowId == windowId) {
@@ -61,6 +67,7 @@ function onTabAttached(tabId, attachInfo) {
 		});
 	}
 }
+
 
 function onTabMoved(tabId, moveInfo) {
 	console.log(`Moving tab ${tabId} from ${moveInfo.fromIndex} to ${moveInfo.toIndex}.`);
@@ -73,6 +80,7 @@ function onTabMoved(tabId, moveInfo) {
 	}
 }
 
+
 function onTabUpdated(tabId, changeInfo, tab) {
 	console.log(`Updating tab ${tabId} - windowId: ${tab.windowId}...`);
 	if (tab.windowId == windowId) {
@@ -81,12 +89,14 @@ function onTabUpdated(tabId, changeInfo, tab) {
 	}
 }
 
+
 function onTabDetached(tabId, detachInfo) {
 	console.log(`Tab ${tabId} detached.`);
 	if (detachInfo.oldWindowId == windowId) {
 		openTabs.splice(detachInfo.ldPosition, 1);
 	}
 }
+
 
 function onTabRemoved(tabId, removeInfo) {
 	console.log(`Tab ${tabId} removed.`);
@@ -100,6 +110,37 @@ function onTabRemoved(tabId, removeInfo) {
 	}
 }
 
+
+function onChromeCommand(command) {
+	console.log('Command:', command);
+	if (command == "toggle") {
+		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+			let activeTab = tabs[0];
+
+			chrome.tabs.executeScript(activeTab.id, {file: "content-script/bin/app.js"}, function() {
+				chrome.tabs.insertCSS(activeTab.id, {file: "content-script/styles.css"}, function() {
+
+					port = chrome.tabs.connect(activeTab.id, {name: "swoop"});
+					port.onMessage.addListener(handleContentScriptMessage);
+					port.onDisconnect.addListener(function() {
+						console.log("Port disconnected.");
+						port = null;
+					});
+
+					/*
+					** Convert to common JSON format as fuzzy search results to keep
+					** content script's display logic simple.
+					*/
+					port.postMessage({command: "show", "data": JSON.stringify(openTabs.map(function(tab){ return {item: tab}}))});
+
+				});
+			});
+
+		});
+	}
+}
+
+
 console.log("Starting up...");
 if (chrome.runtime && chrome.runtime.onStartup) {
 	chrome.runtime.onInstalled.addListener(initialize);
@@ -112,26 +153,7 @@ if (chrome.runtime && chrome.runtime.onStartup) {
 	chrome.tabs.onDetached.addListener(onTabDetached);
 	chrome.tabs.onRemoved.addListener(onTabRemoved);
 
-	chrome.commands.onCommand.addListener(function(command) {
-		console.log('Command:', command);
-		if (command == "toggle") {
-			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-				let activeTab = tabs[0];
-				chrome.tabs.executeScript(activeTab.id, {file: "content-script/bin/app.js"}, function() {
-					chrome.tabs.insertCSS(activeTab.id, {file: "content-script/styles.css"}, function() {
-						port = chrome.tabs.connect(activeTab.id, {name: "swoop"});
-						port.onMessage.addListener(handleMessage);
-						port.onDisconnect.addListener(function() {
-							console.log("Port disconnected.");
-							port = null;
-						});
-						port.postMessage({command: "show", "data": JSON.stringify(openTabs.map(function(tab){ return {item: tab}}))});
-					});
-				});
-
-			});
-		}
-	});
+	chrome.commands.onCommand.addListener(onChromeCommand);
 }
 else {
 	console.log("This extension requires Chrome 23 or above. Please update Chrome and retry.");
