@@ -6,20 +6,27 @@ var state = {
   selectedIndex: -1
 };
 
-var port = chrome.runtime.connect("kflkchgdjgnpnjejjalfnooncfdfpdha", {name: "swoop"});
-port.onMessage.addListener(function(msg) {
-  if (msg.command == "show") {
-    state.tabs = JSON.parse(msg.data);
-    m.redraw();
-  } else if (msg.command == "hide") {
-    state.visible = false;
-    m.redraw();
-  }
-});
+// var port = chrome.runtime.connect("kflkchgdjgnpnjejjalfnooncfdfpdha", {name: "swoop"});
+var port = null;
+chrome.runtime.onConnect.addListener(function(_port) {
+  port = _port;
 
-port.onDisconnect.addListener(function() {
-  console.log("Port disconnected.");
-  port = null;
+  console.log("Incoming connection...");
+  port.onMessage.addListener(function(msg) {
+    if (msg.command == "show") {
+      state.tabs = JSON.parse(msg.data);
+      m.redraw();
+    } else if (msg.command == "hide") {
+      state.visible = false;
+      m.redraw();
+    }
+  });
+
+  port.onDisconnect.addListener(function() {
+    console.log("Port disconnected.");
+    port = null;
+  });
+
 });
 
 module.exports = {

@@ -131,11 +131,20 @@ if (chrome.runtime && chrome.runtime.onStartup) {
 	chrome.commands.onCommand.addListener(function(command) {
 		console.log('Command:', command);
 		if (command == "toggle") {
-			chrome.tabs.executeScript({file: "content-script/bin/app.js"}, function() {
-				chrome.tabs.insertCSS({file: "content-script/styles.css"}, function() {
-					// port.postMessage({command: "show", "data": JSON.stringify(openTabs.map((element) => { return {id: element.id, favIconUrl: element.favIconUrl, title: element.title, url: element.url} }))});
-					port.postMessage({command: "show", "data": JSON.stringify(openTabs.map(function(tab){ return {item: tab}}))});
+			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+				let activeTab = tabs[0];
+				chrome.tabs.executeScript(activeTab.id, {file: "content-script/bin/app.js"}, function() {
+					chrome.tabs.insertCSS(activeTab.id, {file: "content-script/styles.css"}, function() {
+						port = chrome.tabs.connect(activeTab.id, {name: "swoop"});
+						port.onMessage.addListener(handleMessage);
+						port.onDisconnect.addListener(function() {
+							console.log("Port disconnected.");
+							port = null;
+						});
+						port.postMessage({command: "show", "data": JSON.stringify(openTabs.map(function(tab){ return {item: tab}}))});
+					});
 				});
+
 			});
 		}
 	});
