@@ -1,4 +1,4 @@
-var windowId = -1;
+var windowId = 0;
 var openTabs = [];
 var port = null;
 
@@ -20,29 +20,14 @@ function initialize(_) {
 	chrome.windows.getCurrent(function (window) {
 		// windowId = chrome.windows.WINDOW_ID_CURRENT;
 		windowId = window.id;
-		console.log("WindowId: " + windowId);
-		console.log("Loading open tabs...");
+		console.log(`Loading window #${windowId} tabs...`);
 		chrome.tabs.query({'windowId': windowId}, function(tabs) {
 			if (tabs.length > 0) {
-				console.log("Restoring tabs!");
-
+				console.log(`Restored ${tabs.length} tabs!`);
 			}
 			openTabs = tabs;
 		});
 
-	});
-}
-
-function onConnect(_port) {
-	console.log("Accepting connection...");
-	console.assert(_port.name == "swoop");
-	port = _port;
-
-	console.log("Accepted. Listening to incoming messages...");
-	port.onMessage.addListener(handleMessage);
-	port.onDisconnect.addListener(function() {
-		console.log("Port disconnected.");
-		port = null;
 	});
 }
 
@@ -119,7 +104,6 @@ console.log("Starting up...");
 if (chrome.runtime && chrome.runtime.onStartup) {
 	chrome.runtime.onInstalled.addListener(initialize);
 	chrome.runtime.onStartup.addListener(initialize);
-	chrome.runtime.onConnect.addListener(onConnect);
 
 	chrome.tabs.onCreated.addListener(onTabCreated);
 	chrome.tabs.onAttached.addListener(onTabAttached);
