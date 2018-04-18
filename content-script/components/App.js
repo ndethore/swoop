@@ -1,19 +1,19 @@
 var m = require("mithril")
 
 var state = {
+  port: null,
   visible: true,
   tabs: [],
-  selectedIndex: -1
+  selectedIndex: -1,
 };
 
-// var port = chrome.runtime.connect("kflkchgdjgnpnjejjalfnooncfdfpdha", {name: "swoop"});
-var port = null;
 chrome.runtime.onConnect.addListener(function(_port) {
-  port = _port;
+  state.port = _port;
 
   console.log("Incoming connection...");
-  port.onMessage.addListener(function(msg) {
+  state.port.onMessage.addListener(function(msg) {
     if (msg.command == "show") {
+      state.visible = true;
       state.tabs = JSON.parse(msg.data);
       m.redraw();
     } else if (msg.command == "hide") {
@@ -22,11 +22,10 @@ chrome.runtime.onConnect.addListener(function(_port) {
     }
   });
 
-  port.onDisconnect.addListener(function() {
+  state.port.onDisconnect.addListener(function() {
     console.log("Port disconnected.");
-    port = null;
+    state.port = null;
   });
-
 });
 
 module.exports = {
@@ -34,11 +33,11 @@ module.exports = {
     console.log("Initialized with height of: ", vnode.dom.offsetHeight)
     document.addEventListener('keydown', this.onKeydown, false);
   },
- onKeydown: function(event) {
-   /*
-   ** Moved shortcut detection to browser level to avoid to avoid potential
-   ** conflict with pre-existing web page's listeners.
-   */
+  onKeydown: function(event) {
+    /*
+    ** Moved shortcut detection to browser level to avoid to avoid potential
+    ** conflict with pre-existing web page's listeners.
+    */
     // if (event.metaKey && event.shiftKey && event.key == "o") {
     //   state.visible = true;
     //   m.redraw();
@@ -69,26 +68,26 @@ module.exports = {
   view: function() {
     console.log("Rendering...");
     return (
-     <div id="swoop" class={ state.visible? "visible" : "" }>
-       <div id="swoop-container">
-         <input id="swoop-search" type="search" placeholder="Start typing a tab's url or title..." oninput={this.onInput} autofocus/>
-         <p> Use arrows, then enter to open a tab.</p>
-         <div id="swoop-tab-list">
-           {
-             state.tabs.map(function(tab, index) {
-               let style = "tab";
-               style += state.selectedIndex == index? " selected" : "";
-               // console.log(`tab: ${JSON.stringify(tab)}`);
-               return (
-                 <div class={style}>
-                   <b>{tab.item.title}</b><br/>
-                   <i>{tab.item.url}</i>
-                 </div>
-               );
-             })
-           }
-         </div>
-       </div>
+      <div id="swoop" class={ state.visible? "visible" : "" }>
+        <div id="swoop-container">
+          <input id="swoop-search" type="search" placeholder="Start typing a tab's url or title..." oninput={this.onInput} autofocus/>
+          <p> Use arrows, then enter to open a tab.</p>
+          <div id="swoop-tab-list">
+            {
+              state.tabs.map(function(tab, index) {
+                let style = "tab";
+                style += state.selectedIndex == index? " selected" : "";
+                // console.log(`tab: ${JSON.stringify(tab)}`);
+                return (
+                  <div class={style}>
+                    <b>{tab.item.title}</b><br/>
+                    <i>{tab.item.url}</i>
+                  </div>
+                );
+              })
+            }
+          </div>
+        </div>
       </div>
     )
   }

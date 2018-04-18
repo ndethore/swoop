@@ -41,8 +41,7 @@ function handleContentScriptMessage(msg) {
 			chrome.tabs.update(msg.tabId, {active: true})
 			port.postMessage({command: "hide"});
 			break;
-
-		case: "search":
+		case "search":
 			var fuse = new Fuse(openTabs, options);
 			var results = fuse.search(msg.query);
 			port.postMessage({command: "show", "data": JSON.stringify(results)});
