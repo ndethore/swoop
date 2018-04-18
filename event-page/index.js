@@ -2,6 +2,20 @@ var windowId = -1;
 var openTabs = [];
 var port = null;
 
+var options = {
+  shouldSort: true,
+  includeMatches: true,
+  threshold: 0.6,
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 1,
+  keys: [
+    "title",
+    "url"
+]
+};
+
 function initialize(_) {
 	chrome.windows.getCurrent(function (window) {
 		// windowId = chrome.windows.WINDOW_ID_CURRENT;
@@ -38,7 +52,16 @@ function handleMessage(msg) {
 		chrome.tabs.update(msg.tabId, {active: true})
 		port.postMessage({command: "hide"});
 	}
+	else if (msg.command == "search") {
+		console.log(`Searching for: ${msg.query}`);
+		var fuse = new Fuse(openTabs, options);
+		var results = fuse.search(msg.query);
+		console.log(`Fuse: ${results.length} results found.`);
+		port.postMessage({command: "show", "data": JSON.stringify(results)});
+
+	}
 }
+
 
 function onTabCreated(tab) {
 	console.log(`Tab ${tab.id} created.`);
@@ -110,7 +133,8 @@ if (chrome.runtime && chrome.runtime.onStartup) {
 		if (command == "toggle") {
 			chrome.tabs.executeScript({file: "content-script/bin/app.js"}, function() {
 				chrome.tabs.insertCSS({file: "content-script/styles.css"}, function() {
-					port.postMessage({command: "show", "data": JSON.stringify(openTabs.map((element) => { return {id: element.id, favIconUrl: element.favIconUrl, title: element.title, url: element.url} }))});
+					// port.postMessage({command: "show", "data": JSON.stringify(openTabs.map((element) => { return {id: element.id, favIconUrl: element.favIconUrl, title: element.title, url: element.url} }))});
+					port.postMessage({command: "show", "data": JSON.stringify(openTabs.map(function(tab){ return {item: tab}}))});
 				});
 			});
 		}

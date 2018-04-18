@@ -1,5 +1,7 @@
-#switcher { display: none; width: 100%; height: 100%; position: fixed; left: 0; top: 0; z-index: 9999; background-color: white; text-align: center;}
-#switcher.visible { display: block; }
-#tab-list { position: relative; max-width: 340px; margin: 32px auto;}
-.tab { margin-bottom: 20px; text-align: left;}
-.tab.selected { background-color: lightgrey; }
+#swoop { display: none; width: 100%; height: 100%; position: fixed; left: 0; top: 0; z-index: 9999; background-color: white; text-align: center; }
+#swoop.visible { display: block; }
+#swoop-container { max-width: 340px; margin: 32px auto; }
+#swoop-search { width: 100%; line-height: 2em;}
+#swoop-tab-list { position: relative; }
+#swoop-tab-list .tab { margin-bottom: 20px; text-align: left; }
+#swoop-tab-list .tab.selected { background-color: lightgrey; }

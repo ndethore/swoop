@@ -1,16 +1,12 @@
 var m = require("mithril")
 var App = require("./components/App")
 
-var container = document.getElementById("swoop");
-if (!container) {
-	container = document.createElement("div");
-	container.setAttribute("id", "swoop");
-}
+/*
+** Render component in a placeholder div to avoid overriding
+** existing DOM elements.
+*/
+var	container = document.createElement("div");
 
 m.mount(container, App);
 
-// for (var child of container.children) {
-// 	document.body.appendChild(child);
-// }
-
-document.body.appendChild(container);
+document.body.appendChild(container.firstElementChild);

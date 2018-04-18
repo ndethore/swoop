@@ -4,7 +4,7 @@
 	"description": "Tab navigation done right.",
 	"manifest_version": 2,
 	"background": {
-		"scripts": ["eventPage.js"],
+		"scripts": ["event-page/fuse.min.js", "event-page/index.js"],
 		"persistent": true
 	},
 	"permissions": ["tabs", "<all_urls>"],
