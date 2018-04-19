@@ -17,5 +17,6 @@
 #swoop #tab-list .tab .favicon { flex-shrink: 0; width: 24px; height: 24px; background-image: none; }
 #swoop #tab-list .tab .details  { display: flex; flex-direction: column; margin: 0 12px; min-width: 360px;}
 #swoop #tab-list .tab .details * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+#swoop #tab-list .tab .details *.highlighted { background-color: rgb(255, 255, 0, 0.5); text-decoration: underline; text-decoration-color: #eccb2d;}
 #swoop #tab-list .tab .details .url { font-size: 0.8em; }
 #swoop #tab-list .tab.selected { background-color: lightgrey; }

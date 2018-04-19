@@ -7,6 +7,42 @@ var state = {
   selectedIndex: -1,
 };
 
+
+function matchForKey(key, matches) {
+  if (matches) {
+    for (let match of matches) {
+      if (match.key == key) return match;
+    }
+  }
+  return null;
+}
+
+
+function highlight(text, indices, opening, closing) {
+  var chunks = [];
+
+  for (let indice of indices) {
+    const start = indice[0];
+    const end = indice[1];
+
+    chunks.push({text: text.substr(0, start), highlight: false});
+    chunks.push({text: text.substr(start, (end + 1) - start), highlight: true});
+    text = text.substr(end + 1);
+  }
+  chunks.push({text: text, highlight: false});
+  return (
+    <span>
+      {
+        chunks.map(function(chunk) {
+            if (chunk.highlight) return <span class="highlighted">{chunk.text}</span>;
+            return <span>{chunk.text}</span>;
+        })
+      }
+    </span>
+  );
+}
+
+
 chrome.runtime.onConnect.addListener(function(_port) {
   state.port = _port;
 
@@ -30,13 +66,16 @@ chrome.runtime.onConnect.addListener(function(_port) {
   });
 });
 
+
 function lockBodyScroll() {
     document.body.classList.toggle("no-scroll", true);
 }
 
+
 function unlockBodyScroll() {
   document.body.classList.toggle("no-scroll", false);
 }
+
 
 module.exports = {
   oncreate: function(vnode) {
@@ -91,13 +130,27 @@ module.exports = {
               state.tabs.map(function(tab, index) {
                 let style = "tab";
                 style += state.selectedIndex == index? " selected" : "";
-                // console.log(`tab: ${JSON.stringify(tab)}`);
+                if (index == 0) console.log(`tab: ${JSON.stringify(tab)}`);
+
+                let title = tab.item.title;
+                let url = tab.item.url;
+                let match;
+                if ((match = matchForKey("title", tab.matches))) {
+                  console.log("Match found for title! Highlighting...");
+                  title = highlight(title, match.indices, <span class="highlighted">, </span>);
+                }
+                if ((match = matchForKey("url", tab.matches))) {
+                  console.log("Match found for URL! Highlighting...");
+                  url = highlight(url, match.indices, <span class="highlighted">, </span>);
+                }
+
+
                 return (
                   <div class={style}>
                     <img class="favicon" src={tab.item.favIconUrl}/>
                     <div class="details">
-                      <b class="title">{tab.item.title}</b>
-                      <i class="url">{tab.item.url}</i>
+                      <b class="title">{title}</b>
+                      <i class="url">{url}</i>
                     </div>
                   </div>
                 );
