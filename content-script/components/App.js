@@ -58,21 +58,24 @@ module.exports = {
     }
     else if (event.key === "Enter") {
       let tabId = state.tabs[state.selectedIndex].item.id;
-      port.postMessage({command: "open", tabId: tabId});
+      state.port.postMessage({command: "open", tabId: tabId});
     }
   },
   onInput: function(e) {
     let query = e.target.value;
-    port.postMessage({command: "search", query: query});
+    state.port.postMessage({command: "search", query: query});
   },
   view: function() {
     console.log("Rendering...");
     return (
       <div id="swoop" class={ state.visible? "visible" : "" }>
-        <div id="swoop-container">
-          <input id="swoop-search" type="search" placeholder="Start typing a tab's url or title..." oninput={this.onInput} autofocus/>
-          <p> Use arrows, then enter to open a tab.</p>
-          <div id="swoop-tab-list">
+        <div id="container">
+          <div id="search">
+            <svg class="magnifier-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="search" placeholder="Start typing a URL or title..." oninput={this.onInput} autofocus/>
+          </div>
+          {/* <p class="instructions"> Use arrows, then enter to open a tab.</p> */}
+          <div id="tab-list">
             {
               state.tabs.map(function(tab, index) {
                 let style = "tab";
@@ -80,8 +83,11 @@ module.exports = {
                 // console.log(`tab: ${JSON.stringify(tab)}`);
                 return (
                   <div class={style}>
-                    <b>{tab.item.title}</b><br/>
-                    <i>{tab.item.url}</i>
+                    <img class="favicon" src={tab.item.favIconUrl}/>
+                    <div class="details">
+                      <b class="title">{tab.item.title}</b>
+                      <i class="url">{tab.item.url}</i>
+                    </div>
                   </div>
                 );
               })
