@@ -15,9 +15,11 @@ chrome.runtime.onConnect.addListener(function(_port) {
     if (msg.command == "show") {
       state.visible = true;
       state.tabs = JSON.parse(msg.data);
+      lockBodyScroll();
       m.redraw();
     } else if (msg.command == "hide") {
       state.visible = false;
+      unlockBodyScroll();
       m.redraw();
     }
   });
@@ -27,6 +29,14 @@ chrome.runtime.onConnect.addListener(function(_port) {
     state.port = null;
   });
 });
+
+function lockBodyScroll() {
+    document.body.classList.toggle("no-scroll", true);
+}
+
+function unlockBodyScroll() {
+  document.body.classList.toggle("no-scroll", false);
+}
 
 module.exports = {
   oncreate: function(vnode) {
@@ -43,10 +53,11 @@ module.exports = {
     //   m.redraw();
     // }
     if (event.key === "Escape") {
-      if (state.visible == true) {
-        state.visible =  false;
+      // if (state.visible == true) {
+        state.visible = false;
+        unlockBodyScroll();
         m.redraw();
-      }
+      // }
     }
     else if (event.key === "ArrowDown") {
       state.selectedIndex = Math.min(state.selectedIndex + 1, state.tabs.length - 1);

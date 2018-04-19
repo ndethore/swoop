@@ -1,3 +1,5 @@
+.no-scroll { overflow: hidden; }
+
 #swoop { display: none; width: 100%; height: 100%; position: fixed; left: 0; top: 0; z-index: 9999; background-color: rgb(0, 0, 0, 0.3); }
 #swoop * { color:rgb(74, 74, 74); font-size: 14px; line-height: 1.5em; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased;}
 #swoop.visible { display: block; }
