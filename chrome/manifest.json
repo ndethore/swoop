@@ -1,13 +1,16 @@
 {
 	"name": "Swoop!",
 	"version": "1.0",
-	"description": "Tab navigation done right.",
+	"description": "Quickly search and navigate through your tabs using text.",
 	"manifest_version": 2,
 	"background": {
 		"scripts": ["event-page/fuse.min.js", "event-page/index.js"],
 		"persistent": true
 	},
 	"permissions": ["tabs", "<all_urls>"],
+	"browser_action": {
+		"default_icon": "icon.png"
+	},
 	"commands": {
 			"toggle": {
 				"suggested_key": {
