@@ -5,7 +5,7 @@ The missing chrome extension for busy developers. Swoop brings modern code edito
 
 ## Install
 
-* [Chrome Extension]()
+* [Chrome Extension](https://chrome.google.com/webstore/detail/swoop/hnjjjkipglinhabedpmnbimjolifcihd)
 * Safari Extension (coming soon)
 
 
