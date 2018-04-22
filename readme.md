@@ -54,7 +54,7 @@ Once built, load it in the browser of your choice:
 				<li>Open <code>chrome://extensions</code>
 				<li>Check the <strong>Developer mode</strong> checkbox
 				<li>Click on the <strong>Load unpacked extension</strong> button
-				<li>Select the folder <code>swoop</code>
+				<li>Select the folder <code>swoop/chrome/</code>
 			</ol>
 		</td>
 		<td width="50%" style="text-align: center;">
