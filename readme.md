@@ -1,6 +1,6 @@
 <img src="media/logo.png" width="1272">
 
-The missing chrome extension for busy developers. Swoop brings modern code editor's quick open functionality to your browser. 
+The missing chrome extension for busy developers. Swoop brings modern code editor's quick open functionality to your browser.
 
 
 ## Install
@@ -25,13 +25,17 @@ This doesn't necessarily limit you from manually disabling functionality that is
 
 Suggestions and pull requests are highly encouraged!
 
+The extension has two main components:
+- an event page that holds the state and most of the logic.
+- a content script injected into each tabs individually, that act as a UI.
+
 In order to make modifications to the extension you'd need to run it locally.
 
 Please follow the below steps:
 
 ```
 git clone https://github.com/ndethore/swoop
-cd swoop
+cd swoop/chrome/content-script
 npm install    # Install dev dependencies
 npm run build  # Build the extension code so it's ready for the browser
 npm run watch  # Listen for file changes and automatically rebuild
@@ -50,7 +54,7 @@ Once built, load it in the browser of your choice:
 				<li>Open <code>chrome://extensions</code>
 				<li>Check the <strong>Developer mode</strong> checkbox
 				<li>Click on the <strong>Load unpacked extension</strong> button
-				<li>Select the folder <code>swoop/chrome/</code>
+				<li>Select the folder <code>swoop/chrome</code>
 			</ol>
 		</td>
 		<td width="50%" style="text-align: center;">
