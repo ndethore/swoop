@@ -1,7 +1,6 @@
 var windowId = 0;
 var openTabs = [];
 var port = null;
-
 var options = {
   shouldSort: true,
   includeMatches: true,
@@ -17,19 +16,30 @@ var options = {
 };
 
 
-function initialize(_) {
-	chrome.windows.getCurrent(function (window) {
-		// windowId = chrome.windows.WINDOW_ID_CURRENT;
-		windowId = window.id;
-		console.log(`Loading window #${windowId} tabs...`);
-		chrome.tabs.query({'windowId': windowId}, function(tabs) {
-			if (tabs.length > 0) {
-				console.log(`Restored ${tabs.length} tabs!`);
-			}
-			openTabs = tabs;
-		});
+function loadTabs() {
+  chrome.windows.getCurrent(function (window) {
+    windowId = window.id;
+    console.log(`Loading window #${windowId} tabs...`);
+    chrome.tabs.query({'windowId': windowId}, function(tabs) {
+      if (tabs.length > 0) {
+        console.log(`Restored ${tabs.length} tabs!`);
+        console.log(JSON.stringify(tabs));
+      }
+      openTabs = tabs;
+    });
+  });
+}
 
-	});
+
+function onStartup() {
+  console.log("Starting up...");
+  loadTabs();
+}
+
+
+function onInstalled(details) {
+  console.log(`Exentension installed. Reason: ${details.reason}`);
+  loadTabs();
 }
 
 
@@ -71,8 +81,6 @@ function onTabAttached(tabId, attachInfo) {
 function onTabMoved(tabId, moveInfo) {
 	console.log(`Moving tab ${tabId} from ${moveInfo.fromIndex} to ${moveInfo.toIndex}.`);
 	if (moveInfo.windowId == windowId) {
-		console.log("windowcheck ok");
-
 		var removed = openTabs.splice(moveInfo.fromIndex, 1);
 		openTabs.splice(moveInfo.toIndex, 0, removed[0]);
 			console.log(`Tab ${tabId} moved.`);
@@ -110,40 +118,55 @@ function onTabRemoved(tabId, removeInfo) {
 }
 
 
+function injectContentScriptFiles(tabID, callback) {
+  chrome.tabs.executeScript(tabID, {file: "content-script/bin/app.js"}, function() {
+    chrome.tabs.insertCSS(tabID, {file: "content-script/styles.css"}, function() {
+      callback(tabID);
+    });
+  });
+}
+
+
+function connectToContentScript(tabID) {
+  port = chrome.tabs.connect(tabID, {name: "swoop"});
+  port.onMessage.addListener(handleContentScriptMessage);
+  port.onDisconnect.addListener(function() {
+    console.log("Port disconnected.");
+    port = null;
+  });
+
+  /*
+  ** Convert to common JSON format as fuzzy search results to keep
+  ** content script's display logic simple.
+  */
+  port.postMessage({command: "show", "data": JSON.stringify(openTabs.map(function(tab){ return {item: tab}}))});
+}
+
+
 function onChromeCommand(command) {
-	console.log('Command:', command);
 	if (command == "toggle") {
 		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 			let activeTab = tabs[0];
 
-			chrome.tabs.executeScript(activeTab.id, {file: "content-script/bin/app.js"}, function() {
-				chrome.tabs.insertCSS(activeTab.id, {file: "content-script/styles.css"}, function() {
-
-					port = chrome.tabs.connect(activeTab.id, {name: "swoop"});
-					port.onMessage.addListener(handleContentScriptMessage);
-					port.onDisconnect.addListener(function() {
-						console.log("Port disconnected.");
-						port = null;
-					});
-
-					/*
-					** Convert to common JSON format as fuzzy search results to keep
-					** content script's display logic simple.
-					*/
-					port.postMessage({command: "show", "data": JSON.stringify(openTabs.map(function(tab){ return {item: tab}}))});
-
-				});
-			});
+      /*
+      ** Probing active tab for existing content script.
+      */
+      chrome.tabs.sendMessage(activeTab.id, "ping", function(response) {
+        if (response) {
+          connectToContentScript(activeTab.id);
+        } else {
+          injectContentScriptFiles(activeTab.id, connectToContentScript);
+        }
+      });
 
 		});
 	}
 }
 
 
-console.log("Starting up...");
 if (chrome.runtime && chrome.runtime.onStartup) {
-	chrome.runtime.onInstalled.addListener(initialize);
-	chrome.runtime.onStartup.addListener(initialize);
+	chrome.runtime.onInstalled.addListener(onInstalled);
+	chrome.runtime.onStartup.addListener(onStartup);
 
 	chrome.tabs.onCreated.addListener(onTabCreated);
 	chrome.tabs.onAttached.addListener(onTabAttached);

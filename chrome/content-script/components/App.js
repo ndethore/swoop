@@ -43,6 +43,12 @@ function highlight(text, indices, opening, closing) {
 }
 
 
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+  console.log(`Incoming Handshake from event-page...`);
+  sendResponse("pong");
+});
+
+
 chrome.runtime.onConnect.addListener(function(_port) {
   state.port = _port;
 
