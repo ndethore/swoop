@@ -55,6 +55,7 @@ chrome.runtime.onConnect.addListener(function(_port) {
   console.log("Incoming connection...");
   state.port.onMessage.addListener(function(msg) {
     if (msg.command == "show") {
+      document.addEventListener('keydown', this.onKeydown, false);
       state.visible = true;
       state.tabs = JSON.parse(msg.data);
       lockBodyScroll();
@@ -84,9 +85,11 @@ function unlockBodyScroll() {
 
 
 module.exports = {
+  oninit: function(vnode) {
+    document.addEventListener('keydown', this.onKeydown, false);
+  },
   oncreate: function(vnode) {
     console.log("Initialized with height of: ", vnode.dom.offsetHeight)
-    document.addEventListener('keydown', this.onKeydown, false);
   },
   onKeydown: function(event) {
     /*
@@ -98,11 +101,10 @@ module.exports = {
     //   m.redraw();
     // }
     if (event.key === "Escape") {
-      // if (state.visible == true) {
-        state.visible = false;
-        unlockBodyScroll();
-        m.redraw();
-      // }
+      document.removeEventListener('keydown', this.onKeydown);
+      state.visible = false;
+      unlockBodyScroll();
+      m.redraw();
     }
     else if (event.key === "ArrowDown") {
       state.selectedIndex = Math.min(state.selectedIndex + 1, state.tabs.length - 1);
