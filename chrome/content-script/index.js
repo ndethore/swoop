@@ -1,6 +1,9 @@
 var m = require("mithril")
-var App = require("./components/App")
+import App from './src/components/App.jsx'
+import ChromeController from './src/ChromeController.js'
 
+var controller = new ChromeController();
+// controller.init();
 /*
 ** Render component in a placeholder div to avoid overriding
 ** existing DOM elements.
@@ -11,4 +14,5 @@ if (!slot) {
 	slot.setAttribute("id", "swoop-slot");
 	document.body.appendChild(slot);
 }
-m.mount(slot, App);
+
+m.mount(slot, {view: function () {return m(App, {controller: controller})}})
