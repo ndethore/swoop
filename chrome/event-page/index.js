@@ -156,13 +156,13 @@ function onChromeCommand(command) {
       /*
       ** Probing active tab for existing content script.
       */
-      chrome.tabs.sendMessage(activeTab.id, "ping", function(response) {
-        if (response) {
+      // chrome.tabs.sendMessage(activeTab.id, "ping", function(response) {
+      //   if (response) {
           connectToContentScript(activeTab.id);
-        } else {
-          injectContentScriptFiles(activeTab.id, connectToContentScript);
-        }
-      });
+        // } else {
+        //   injectContentScriptFiles(activeTab.id, connectToContentScript);
+        // }
+      // });
 
 		});
 	}

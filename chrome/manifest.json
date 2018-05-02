@@ -7,6 +7,13 @@
 		"scripts": ["event-page/fuse.min.js", "event-page/index.js"],
 		"persistent": true
 	},
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"css": ["content-script/styles.css"],
+			"js": ["content-script/bin/app.js"]
+		}
+	],
 	"permissions": ["tabs", "<all_urls>"],
 	"browser_action": {
 		"default_icon": "icon.png"
