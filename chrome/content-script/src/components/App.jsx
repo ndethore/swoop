@@ -8,6 +8,7 @@ export default class App {
   constructor(vnode) {
     console.log("Contructing app component...");
     this.tabs = [];
+    this.input = "";
     this.visible = false;
     this.selectedIndex = -1;
   }
@@ -85,9 +86,11 @@ export default class App {
   }
 
   onInput = (event) => {
-    console.log("New Input!");
-    let query = event.target.value;
-    this.controller.search(query);
+    console.log(`New Input: ${event.target.value}`);
+    if (this.input !== event.target.value) {
+      this.input = event.target.value;
+      this.controller.search(this.input);
+    }
   }
 
   /*
