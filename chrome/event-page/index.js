@@ -52,9 +52,14 @@ function handleContentScriptMessage(msg) {
 			port.postMessage({command: "hide"});
 			break;
 		case "search":
-			var fuse = new Fuse(openTabs, options);
-			var results = fuse.search(msg.query);
-			port.postMessage({command: "show", "data": JSON.stringify(results)});
+      if (msg.query.trim().length > 0) {
+        var fuse = new Fuse(openTabs, options);
+        var results = fuse.search(msg.query);
+        port.postMessage({command: "show", "data": JSON.stringify(results)});
+      }
+      else {
+        port.postMessage({command: "show", "data": JSON.stringify(openTabs.map(function(tab){ return {item: tab}}))});
+      }
 			break;
 
 		default: break;
