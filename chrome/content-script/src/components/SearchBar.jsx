@@ -1,6 +1,10 @@
 var m = require("mithril");
 
 export default class SearchBar {
+	onupdate() {
+		document.querySelector("#swoop #search input").focus();
+	}
+
 	view(vnode) {
 		return (
 			<div id="search">
