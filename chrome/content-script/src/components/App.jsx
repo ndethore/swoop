@@ -6,8 +6,9 @@ import TabList from './TabList.jsx';
 
 export default class App {
   constructor(vnode) {
+    console.log("Contructing app component...");
     this.tabs = [];
-    this.visible = true;
+    this.visible = false;
     this.selectedIndex = -1;
   }
 
@@ -20,7 +21,6 @@ export default class App {
 
   oncreate(vnode) {
     console.log("Initialized with height of: ", vnode.dom.offsetHeight);
-    document.addEventListener('keydown', vnode.state.onKeydown, false);
     this.controller = vnode.attrs.controller;
     this.controller.onShowCommand = this.show;
     this.controller.onHideCommand = this.hide;
@@ -42,6 +42,7 @@ export default class App {
     this.visible = true;
     this.tabs = JSON.parse(data);
     this.lockBodyScroll();
+    document.addEventListener('keydown', this.onKeydown, false);
     m.redraw();
   }
 
@@ -95,7 +96,7 @@ export default class App {
   view(vnode) {
     const state = vnode.state;
     console.log("Rendering...");
-
+    console.log(`visible: ${state.visible}`);
     return (
       <div id="swoop" class={state.visible ? "visible" : ""}>
         <div id="container">

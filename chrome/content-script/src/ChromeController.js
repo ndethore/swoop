@@ -19,11 +19,11 @@ export default class ChromeController {
     console.log(`Command received from event page: ${message.command}`);
     switch (message.command) {
       case "show": {
-				if (this.onShow) this.onShowCommand(message.data);
+				if (this.onShowCommand) this.onShowCommand(message.data);
 				break;
 			}
       case "hide": {
-				if (this.onHide) this.onHideCommand();
+				if (this.onHideCommand) this.onHideCommand();
 				break;
 			}
       default: break;
@@ -47,7 +47,6 @@ export default class ChromeController {
 	onHandshake = (message, sender, sendResponse) => {
     // Responding to probe from the extension to check if
     // a content script already exists on the page
-    console.log(`Incoming Handshake from event-page...`);
     sendResponse("pong");
   }
 
