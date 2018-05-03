@@ -26,7 +26,7 @@
 	"commands": {
 			"toggle": {
 				"suggested_key": {
-					"default": "Ctrl+K",
+					"default": "Ctrl+M",
 					"mac": "Command+K"
 				},
 				"description": "Toggle switcher UI"
