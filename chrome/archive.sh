@@ -2,7 +2,7 @@
 
 mkdir temp
 cp manifest.json temp/
-cp icon.png temp/
+cp icon*.png temp/
 
 mkdir -p temp/content-script/bin
 cp content-script/styles.css temp/content-script/
