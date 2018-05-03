@@ -172,6 +172,11 @@ function onChromeCommand(command) {
 if (chrome.runtime && chrome.runtime.onStartup) {
 	chrome.runtime.onInstalled.addListener(onInstalled);
 	chrome.runtime.onStartup.addListener(onStartup);
+  chrome.runtime.onUpdateAvailable.addListener(function(details) {
+    console.log(`New upate available: ${details.version}`);
+    console.log(`Installing...`);
+    chrome.runtime.reload();
+  });
 
 	chrome.tabs.onCreated.addListener(onTabCreated);
 	chrome.tabs.onAttached.addListener(onTabAttached);
