@@ -33,17 +33,23 @@ export default class App {
   ** Instance Methods
   */
   hide = () => {
-    this.visible = false;
     this.unlockBodyScroll();
     document.removeEventListener('keydown', this.onKeydown);
+
+    this.visible = false;
+
     m.redraw();
   }
 
   show = (data) => {
-    this.visible = true;
-    this.tabs = JSON.parse(data);
     this.lockBodyScroll();
     document.addEventListener('keydown', this.onKeydown, false);
+
+    const searching = this.input.length > 0;
+    this.visible = true;
+    this.tabs = JSON.parse(data);
+    this.selectedIndex = searching? 0 : -1;
+
     m.redraw();
   }
 
