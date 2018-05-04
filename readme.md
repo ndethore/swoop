@@ -12,7 +12,7 @@ The missing chrome extension for busy developers. Swoop brings modern code edito
 ## How it works
 **Default Shortucts:**
 - Mac: <kbd>Command ⌘</kbd> + <kbd>K</kbd>
-- Windows and Linux: <kbd>Ctrl</kbd> + <kbd>K</kbd>
+- Windows and Linux: <kbd>Ctrl</kbd> + <kbd>M</kbd>
 <img src="media/screenshot.gif" width="1272">
 
 ## Customization
